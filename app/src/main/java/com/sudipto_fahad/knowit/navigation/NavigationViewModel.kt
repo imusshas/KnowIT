@@ -96,14 +96,17 @@ class NavigationViewModel @Inject constructor(
             if (response.isSuccessful) {
                 val requestOTPResponse = response.body()
                 Log.d(TAG, "requestOTP: ${response.body()}")
-                if (requestOTPResponse?.statusDetail == "Success") {
+                if (requestOTPResponse?.statusCode == "S1000") {
                     _referenceNo.update { requestOTPResponse.referenceNo }
                     _navigateToOTPScreen.update { true }
                 } else if (requestOTPResponse?.statusDetail == "user already registered") {
                     _error.update { "User is Already Registered" }
+                } else {
+                    _error.update { "Something went wrong. Please try again." }
                 }
             } else {
                 Log.d(TAG, "requestOTP: error: ${response.errorBody()}")
+                _error.update { "Something went wrong. Please try again." }
             }
         }
     }
@@ -118,13 +121,14 @@ class NavigationViewModel @Inject constructor(
                 val verifyResponse = it
                 if (verifyResponse.isSuccessful) {
                     val verifyOTPResponse = verifyResponse.body()
-                    if (verifyOTPResponse?.statusDetail == "Success") {
+                    if (verifyOTPResponse?.statusCode == "S1000") {
                         saveUser(UserModel(phoneNo = phoneNo.value))
                     } else {
                         _otpError.update { "Invalid OTP" }
                     }
                 } else {
                     Log.d(TAG, "verifyOTP: error: ${verifyResponse.errorBody()}")
+                    _otpError.update { "Something went wrong. Please try again." }
                 }
             }
         }
